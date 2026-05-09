@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-const API = 'http://localhost:4000/api';
+const API = '/api';
 
 const SERVICES = [
   { name: 'Basic Wash', price: 45 },
@@ -49,8 +49,7 @@ function getUpsells(services) {
   services.forEach(svc => {
     (UPSELL_RULES[svc.name] || []).forEach(u => {
       if (!seen.has(u.name) && !services.find(s => s.name === u.name)) {
-        seen.add(u.name);
-        result.push(u);
+        seen.add(u.name); result.push(u);
       }
     });
   });
@@ -159,7 +158,7 @@ export default function App() {
         fetch(`${API}/invoices`).then(r => r.json()),
         fetch(`${API}/stats`).then(r => r.json())
       ]);
-      setInvoices(inv);
+      setInvoices(Array.isArray(inv) ? inv : []);
       setStats(st);
     } catch {}
   }, []);
@@ -190,6 +189,35 @@ export default function App() {
   const calcTotal = (inv) => (inv.services.reduce((s, sv) => s + parseFloat(sv.price), 0) * 1.0725).toFixed(2);
   const formatDate = (iso) => new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric' });
 
+  // Build SMS message and open native Messages app
+  const sendSMS = (inv) => {
+    const t = calcTotal(inv);
+    const serviceList = inv.services.map(s => `  • ${s.name}: $${parseFloat(s.price).toFixed(2)}`).join('\n');
+    const msg = `Hey ${inv.customer.name}! 👋\n\nHere's your invoice from Bakersfield's Best Mobile Detailing:\n\nInvoice #${inv.id}\n\n${serviceList}\n\nTotal: $${t}\n\nThank you for your business! 🚗✨\nQuestions? Call/text us anytime.`;
+    window.location.href = `sms:${inv.customer.phone}?body=${encodeURIComponent(msg)}`;
+    // Mark as sent
+    fetch(`${API}/invoices/${inv.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ smsSent: true })
+    }).then(() => { loadData(); showToast('Messages app opened! 📱'); });
+  };
+
+  // Build email and open native mail app
+  const sendEmail = (inv) => {
+    if (!inv.customer.email) { showToast('No email on file', 'error'); return; }
+    const t = calcTotal(inv);
+    const serviceList = inv.services.map(s => `${s.name}: $${parseFloat(s.price).toFixed(2)}`).join('%0A');
+    const subject = encodeURIComponent(`Invoice #${inv.id} — $${t} — Bakersfield's Best Mobile Detailing`);
+    const body = encodeURIComponent(`Hi ${inv.customer.name},\n\nThank you for choosing Bakersfield's Best Mobile Detailing!\n\nInvoice #${inv.id}\n\nServices:\n${inv.services.map(s=>`  • ${s.name}: $${parseFloat(s.price).toFixed(2)}`).join('\n')}\n\nTotal: $${t}\n\n${inv.notes ? `Notes: ${inv.notes}\n\n` : ''}We appreciate your business! If you have any questions, just reply to this email.\n\nBakersfield's Best Mobile Detailing`);
+    window.location.href = `mailto:${inv.customer.email}?subject=${subject}&body=${body}`;
+    fetch(`${API}/invoices/${inv.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ emailSent: true })
+    }).then(() => { loadData(); showToast('Mail app opened! 📧'); });
+  };
+
   const createInvoice = async () => {
     if (!customer.name || !customer.phone || selectedServices.length === 0) {
       showToast('Add customer info and at least one service', 'error'); return;
@@ -218,26 +246,6 @@ export default function App() {
     showToast('Marked as paid! 💰');
     setSelectedInvoice(p => ({ ...p, status:'paid' }));
     loadData();
-  };
-
-  const sendSMS = async (id) => {
-    setLoading(true);
-    try {
-      const d = await fetch(`${API}/invoices/${id}/send-sms`, { method:'POST' }).then(r => r.json());
-      d.success ? showToast('SMS sent! 📱') : showToast(d.error, 'error');
-    } catch { showToast('SMS failed', 'error'); }
-    await loadData();
-    setLoading(false);
-  };
-
-  const sendEmail = async (id) => {
-    setLoading(true);
-    try {
-      const d = await fetch(`${API}/invoices/${id}/send-email`, { method:'POST' }).then(r => r.json());
-      d.success ? showToast('Email sent! 📧') : showToast(d.error, 'error');
-    } catch { showToast('Email failed', 'error'); }
-    await loadData();
-    setLoading(false);
   };
 
   return (
@@ -417,14 +425,12 @@ export default function App() {
             )}
             <div className="section-title" style={{ fontSize:14 }}>Send Invoice</div>
             <div className="action-row">
-              <button className="btn btn-primary btn-sm" onClick={() => sendSMS(selectedInvoice.id)} disabled={loading}>
+              <button className="btn btn-primary btn-sm" onClick={() => sendSMS(selectedInvoice)}>
                 📱 {selectedInvoice.smsSent ? 'Resend SMS' : 'Send SMS'}
               </button>
-              {selectedInvoice.customer.email && (
-                <button className="btn btn-secondary btn-sm" onClick={() => sendEmail(selectedInvoice.id)} disabled={loading}>
-                  📧 {selectedInvoice.emailSent ? 'Resend Email' : 'Send Email'}
-                </button>
-              )}
+              <button className="btn btn-secondary btn-sm" onClick={() => sendEmail(selectedInvoice)}>
+                📧 {selectedInvoice.emailSent ? 'Resend Email' : 'Send Email'}
+              </button>
             </div>
             {selectedInvoice.status !== 'paid' && (
               <button className="btn btn-green" onClick={() => markPaid(selectedInvoice.id)}>✓ Mark as Paid</button>
