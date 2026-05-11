@@ -135,3 +135,16 @@ app.get('/api/invoices/:id/pdf', async (req, res) => {
 });
 
 module.exports = app;
+
+app.get('/api/test', async (req, res) => {
+  try {
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_ANON_KEY;
+    if (!url || !key) return res.json({ error: 'Missing env vars', url: !!url, key: !!key });
+    const { data, error } = await supabase.from('invoices').select('count');
+    if (error) return res.json({ error: error.message });
+    res.json({ ok: true, data });
+  } catch(e) {
+    res.json({ crash: e.message });
+  }
+});
