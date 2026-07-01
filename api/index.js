@@ -1,19 +1,26 @@
 const express = require('express');
-const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 app.use(express.json());
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+let supabase;
+let supabaseError;
+try {
+  const { createClient } = require('@supabase/supabase-js');
+  supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY
+  );
+} catch(e) {
+  supabaseError = e.message;
+}
 
 app.get('/api/test', async (req, res) => {
   try {
     const url = process.env.SUPABASE_URL;
     const key = process.env.SUPABASE_ANON_KEY;
     if (!url || !key) return res.json({ error: 'Missing env vars', url: !!url, key: !!key });
+    if (!supabase) return res.json({ error: 'Supabase init failed', reason: supabaseError });
     const { data, error } = await supabase.from('invoices').select('count');
     if (error) return res.json({ supabase_error: error.message });
     res.json({ ok: true, count: data });
