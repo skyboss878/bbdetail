@@ -310,7 +310,7 @@ function Contact() {
           </div>
         )}
         <div style={{marginTop:'2.5rem', display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:'1rem', textAlign:'center', color:'rgba(200,200,204,0.5)', fontSize:'0.75rem'}}>
-          <div><div style={{color:C.gold, marginBottom:'0.3rem'}}>📞</div>Call or Text<br/><span style={{color:'rgba(200,200,204,0.7)'}}>(661) 555-0000</span></div>
+          <div><div style={{color:C.gold, marginBottom:'0.3rem'}}>📞</div>Call or Text<br/><span style={{color:'rgba(200,200,204,0.7)'}}>(661) 932-0000</span></div>
           <div><div style={{color:C.gold, marginBottom:'0.3rem'}}>📍</div>Serving<br/><span style={{color:'rgba(200,200,204,0.7)'}}>All of Bakersfield</span></div>
           <div><div style={{color:C.gold, marginBottom:'0.3rem'}}>🕐</div>Hours<br/><span style={{color:'rgba(200,200,204,0.7)'}}>Mon–Sat 7am–6pm</span></div>
         </div>
