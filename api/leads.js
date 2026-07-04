@@ -27,13 +27,22 @@ export default async function handler(req, res) {
           : '',
         dateRaw: rec.fields.Date || '',
       }))
-      const appointments = allRecords
+      const manualAppts = allRecords
         .filter(l => l.notes?.startsWith('appt:'))
         .map(l => ({
           ...l,
           date: l.notes.match(/date:([^|]+)/)?.[1]?.trim() || '',
           time: l.notes.match(/time:([^|]+)/)?.[1]?.trim() || '',
         }))
+      const agentAppts = allRecords
+        .filter(l => !l.notes?.startsWith('appt:') && l.dateRaw && (l.source === 'ai-agent' || l.status === 'booked' || l.status === 'confirmed'))
+        .map(l => {
+          const d = new Date(l.dateRaw)
+          const date = d.toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' })
+          const time = d.toLocaleTimeString('en-US', { timeZone: 'America/Los_Angeles', hour: 'numeric', minute: '2-digit' })
+          return { ...l, date, time }
+        })
+      const appointments = [...manualAppts, ...agentAppts]
       const leads = allRecords.filter(l => !l.notes?.startsWith('appt:'))
       return res.status(200).json({ leads, appointments })
     } catch (err) {
