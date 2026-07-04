@@ -1,7 +1,8 @@
+const BASE  = process.env.AIRTABLE_BASE_ID  || 'appNp2qvT32FiDGlC'
+const TABLE = process.env.AIRTABLE_TABLE_ID || 'tbl8TunsPVdQPvktw'
+const TOKEN = process.env.AIRTABLE_TOKEN
+
 export default async function handler(req, res) {
-  const BASE  = process.env.AIRTABLE_BASE_ID
-  const TABLE = process.env.AIRTABLE_TABLE_ID
-  const TOKEN = process.env.AIRTABLE_TOKEN
   const headers = { 'Authorization': `Bearer ${TOKEN}`, 'Content-Type': 'application/json' }
 
   if (req.method === 'GET') {
@@ -11,7 +12,6 @@ export default async function handler(req, res) {
         { headers }
       )
       const data = await r.json()
-
       const allRecords = (data.records || []).map(rec => ({
         id:      rec.id,
         name:    rec.fields.Name    || '',
@@ -27,8 +27,6 @@ export default async function handler(req, res) {
           : '',
         dateRaw: rec.fields.Date || '',
       }))
-
-      // Appointments have notes starting with "appt:"
       const appointments = allRecords
         .filter(l => l.notes?.startsWith('appt:'))
         .map(l => ({
@@ -36,10 +34,7 @@ export default async function handler(req, res) {
           date: l.notes.match(/date:([^|]+)/)?.[1]?.trim() || '',
           time: l.notes.match(/time:([^|]+)/)?.[1]?.trim() || '',
         }))
-
-      // Leads are everything else
       const leads = allRecords.filter(l => !l.notes?.startsWith('appt:'))
-
       return res.status(200).json({ leads, appointments })
     } catch (err) {
       return res.status(500).json({ error: err.message, leads: [], appointments: [] })
