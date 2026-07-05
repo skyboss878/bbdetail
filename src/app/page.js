@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import ChatWidget from '../components/ChatWidget'
+import Logo from '../components/Logo'
 
 const C = {
   obs:'#0A0A0B', carb:'#141416', graph:'#1E1E22', steel:'#2C2C32',
@@ -51,8 +52,11 @@ function NavBar() {
       transition:'all 0.3s',
     }}>
       <div style={{maxWidth:'1100px', margin:'0 auto', padding:'1rem 1.5rem', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-        <div style={{fontFamily:'Cormorant Garamond,serif', fontSize:'1.4rem', fontWeight:600, color:C.sil}}>
-          BB<span style={{color:C.gold}}>MD</span>
+        <div style={{display:'flex', alignItems:'center', gap:'0.6rem'}}>
+          <Logo size={38} />
+          <span style={{fontFamily:'Cormorant Garamond,serif', fontSize:'1.4rem', fontWeight:600, color:C.sil}}>
+            BB<span style={{color:C.gold}}>MD</span>
+          </span>
         </div>
         <div style={{display:'flex', alignItems:'center', gap:'2rem'}} className="desktop-nav">
           {NAV.map(l => (
@@ -85,6 +89,9 @@ function Hero() {
   return (
     <section style={{minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', position:'relative', background:C.obs, padding:'6rem 1.5rem 2rem'}}>
       <div style={{textAlign:'center', maxWidth:'800px'}}>
+        <div style={{display:'flex', justifyContent:'center', marginBottom:'1.5rem'}}>
+          <Logo size={96} />
+        </div>
         <div style={{display:'inline-block', border:`1px solid rgba(201,168,76,0.3)`, color:C.gold, fontSize:'0.7rem', letterSpacing:'0.3em', textTransform:'uppercase', padding:'0.4rem 1rem', marginBottom:'2rem'}}>
           Bakersfield, CA · Mobile Service
         </div>
