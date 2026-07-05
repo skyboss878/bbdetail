@@ -334,10 +334,26 @@ function Footer() {
   )
 }
 
+function ChatButton() {
+  return (
+    <a href="/chat" style={{
+      position:'fixed', bottom:'1.5rem', right:'1.5rem', zIndex:60,
+      background:C.gold, color:C.obs, textDecoration:'none',
+      display:'flex', alignItems:'center', gap:'0.5rem',
+      padding:'0.85rem 1.3rem', borderRadius:'999px',
+      fontWeight:700, fontSize:'0.85rem',
+      boxShadow:'0 4px 20px rgba(201,168,76,0.4)',
+    }}>
+      💬 Book Now
+    </a>
+  )
+}
+
 export default function Home() {
   return (
     <main>
       <NavBar />
+      <ChatButton />
       <Hero />
       <Services />
       <WhyUs />
