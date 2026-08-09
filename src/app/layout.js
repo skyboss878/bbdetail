@@ -2,12 +2,12 @@ import './globals.css'
 
 export const metadata = {
   metadataBase: new URL('https://bakersfieldsbestmobiledetailing.com'),
-  title: "Mobile Detailing Bakersfield CA | Bakersfield's Best Mobile Detailing",
-  description: "Bakersfield's #1 mobile car detailing — we come to you! Full details from $80, ceramic coating, paint correction. Serving all of Bakersfield, Oildale & Rosedale. Book online or call (661) 932-0000.",
-  keywords: "mobile detailing Bakersfield, car detailing Bakersfield CA, mobile car wash Bakersfield, ceramic coating Bakersfield, auto detailing near me, paint correction Bakersfield, mobile detailer 661",
+  title: "Ceramic Coating & Mobile Detailing Bakersfield CA | Bakersfield's Best Mobile Detailing",
+  description: "Bakersfield's #1 mobile car detailing — specializing in ceramic coatings, liquid PPF, and wipe-on window tint, with NanoPro's next-gen protection film coming soon. We come to you! Full details from $80. Serving all of Bakersfield, Oildale & Rosedale. Book online or call (661) 932-0000.",
+  keywords: "mobile detailing Bakersfield, car detailing Bakersfield CA, mobile car wash Bakersfield, ceramic coating Bakersfield, ceramic coating specialist Bakersfield, liquid PPF Bakersfield, paint protection film Bakersfield, window tint Bakersfield, auto detailing near me, paint correction Bakersfield, mobile detailer 661",
   openGraph: {
-    title: "Bakersfield's Best Mobile Detailing — We Come To You",
-    description: "Showroom-quality mobile detailing anywhere in Bakersfield. Details from $80, ceramic coating from $500. Book online 24/7.",
+    title: "Bakersfield's Best Mobile Detailing — Ceramic Coating Specialists",
+    description: "Showroom-quality mobile detailing anywhere in Bakersfield. Ceramic coatings, liquid PPF, and wipe-on tint — with next-gen protection film coming soon. Book online 24/7.",
     url: "https://bakersfieldsbestmobiledetailing.com",
     siteName: "Bakersfield's Best Mobile Detailing",
     locale: "en_US",
@@ -42,7 +42,9 @@ const localBusinessSchema = {
   "makesOffer": [
     { "@type": "Offer", "name": "Express Detail", "price": "80", "priceCurrency": "USD" },
     { "@type": "Offer", "name": "Signature Detail", "price": "160", "priceCurrency": "USD" },
-    { "@type": "Offer", "name": "Ceramic Coating", "price": "500", "priceCurrency": "USD" }
+    { "@type": "Offer", "name": "Ceramic Coating", "price": "500", "priceCurrency": "USD" },
+    { "@type": "Offer", "name": "Liquid PPF" },
+    { "@type": "Offer", "name": "Wipe-On Window Tint" }
   ]
 }
 

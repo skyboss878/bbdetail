@@ -87,7 +87,7 @@ async function createBooking(b) {
 
   try {
     const sid = process.env.TWILIO_ACCOUNT_SID
-    await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
+    const smsRes = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
       method: 'POST',
       headers: {
         'Authorization': 'Basic ' + Buffer.from(`${sid}:${process.env.TWILIO_AUTH_TOKEN}`).toString('base64'),
@@ -99,7 +99,13 @@ async function createBooking(b) {
         Body: `NEW BOOKING\n${b.service}\n${b.date} @ ${b.slot}\n${b.name} ${b.phone}\n${b.address}`
       })
     })
-  } catch (e) { console.error('SMS failed:', e) }
+    if (!smsRes.ok) {
+      const errText = await smsRes.text()
+      console.error('SMS rejected by Twilio:', smsRes.status, errText)
+    } else {
+      console.log('SMS sent OK to', process.env.OWNER_PHONE)
+    }
+  } catch (e) { console.error('SMS network error:', e) }
 
   return { ok: true, confirmed: `${b.date} at ${b.slot}` }
 }

@@ -15,7 +15,10 @@ const SERVICES = [
   { icon:'◈', title:'Interior Detail',  desc:'Deep vacuum, steam clean, leather conditioning, odor elimination, dash and console restoration.', price:'From $100' },
   { icon:'⬡', title:'Full Detail',      desc:'The complete treatment — inside and out. Every surface addressed, every panel polished.', price:'From $160' },
   { icon:'◉', title:'Paint Correction', desc:'Multi-stage machine polish removes swirls, scratches, and oxidation. Reveal the paint underneath.', price:'From $250' },
-  { icon:'◌', title:'Ceramic Coating',  desc:'Professional-grade nano-ceramic protection. Hydrophobic, gloss-amplifying, built to last.', price:'From $400' },
+  { icon:'◌', title:'Ceramic Coating',  desc:'Our specialty. Professional-grade nano-ceramic protection — hydrophobic, gloss-amplifying, built to last.', price:'From $400', tag:'Specialty' },
+  { icon:'❖', title:'Liquid PPF',       desc:"NanoPro's self-healing liquid paint protection film — flows into every contour with no vinyl edges to lift, and outlasts traditional hard PPF.", price:'Ask for quote', tag:'New' },
+  { icon:'▨', title:'Wipe-On Window Tint', desc:'Ceramic tint film applied by hand — heat rejection and UV protection with a clean, bubble-free finish and no bulky install.', price:'Ask for quote', tag:'New' },
+  { icon:'⛨', title:'NanoPro Bodyguard PPF', desc:"NanoPro's next-generation ultra-durable liquid PPF, built for maximum impact resistance. Currently in pre-release — join the waitlist to be first in Bakersfield.", price:'Coming 2026', tag:'Coming Soon' },
   { icon:'▣', title:'Fleet Detailing',  desc:'Keep your whole fleet sharp. Recurring schedules available for 3+ vehicles.', price:'Call for quote' },
 ]
 
@@ -100,14 +103,14 @@ function Hero() {
           <span style={{display:'block', color:C.gold}}>Showroom clean.</span>
         </h1>
         <p style={{color:C.chro, fontSize:'1.1rem', maxWidth:'480px', margin:'0 auto 2.5rem', lineHeight:1.6, fontWeight:300}}>
-          Bakersfield's best mobile detailing — we come to your home, office, or anywhere in between.
+          Bakersfield's best mobile detailing — specializing in ceramic coatings, liquid PPF, and precision tint. We come to your home, office, or anywhere in between.
         </p>
         <div style={{display:'flex', gap:'1rem', justifyContent:'center', flexWrap:'wrap'}}>
           <button onClick={() => go('contact')} style={{background:C.gold, color:C.obs, fontWeight:700, fontSize:'0.85rem', padding:'0.9rem 2rem', border:'none', cursor:'pointer', letterSpacing:'0.03em'}}>Book Your Detail</button>
           <button onClick={() => go('packages')} style={{background:'transparent', color:C.chro, fontSize:'0.85rem', padding:'0.9rem 2rem', border:`1px solid rgba(200,200,204,0.3)`, cursor:'pointer'}}>See Packages</button>
         </div>
         <div style={{marginTop:'4rem', display:'flex', justifyContent:'center', gap:'1.5rem', flexWrap:'wrap', color:'rgba(200,200,204,0.5)', fontSize:'0.7rem', letterSpacing:'0.15em', textTransform:'uppercase'}}>
-          {['5★ Rated','Fully Insured','Eco Products','Self-Contained'].map(t => (
+          {['Ceramic Coating Specialists','5★ Rated','Fully Insured','Self-Contained'].map(t => (
             <span key={t} style={{display:'flex', alignItems:'center', gap:'0.5rem'}}>
               <span style={{width:'4px', height:'4px', borderRadius:'50%', background:C.gold, display:'inline-block'}}></span>{t}
             </span>
@@ -136,11 +139,14 @@ function Services() {
         <div style={{height:'1px', background:`linear-gradient(90deg, transparent, ${C.gold}, transparent)`, marginBottom:'3rem'}}></div>
         <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:'1px', background:C.steel}}>
           {SERVICES.map((s,i) => (
-            <div key={i} style={{background:C.carb, padding:'2rem'}}>
+            <div key={i} onClick={() => { if (s.tag === 'Coming Soon') document.getElementById('contact')?.scrollIntoView({behavior:'smooth'}) }} style={{background:C.carb, padding:'2rem', position:'relative', cursor: s.tag === 'Coming Soon' ? 'pointer' : 'default'}}>
+              {s.tag && (
+                <span style={{position:'absolute', top:'1.2rem', right:'1.2rem', fontSize:'0.6rem', fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color: s.tag === 'Specialty' ? C.obs : s.tag === 'Coming Soon' ? C.chro : C.gold, background: s.tag === 'Specialty' ? C.gold : s.tag === 'Coming Soon' ? 'rgba(200,200,204,0.12)' : 'rgba(201,168,76,0.15)', border: s.tag === 'Specialty' ? 'none' : s.tag === 'Coming Soon' ? '1px solid rgba(200,200,204,0.3)' : '1px solid rgba(201,168,76,0.4)', padding:'0.25rem 0.6rem'}}>{s.tag}</span>
+              )}
               <div style={{color:C.gold, fontSize:'1.5rem', marginBottom:'1rem'}}>{s.icon}</div>
               <h3 style={{fontFamily:'Cormorant Garamond,serif', fontSize:'1.5rem', fontWeight:600, color:C.sil, marginBottom:'0.75rem'}}>{s.title}</h3>
               <p style={{color:'rgba(200,200,204,0.7)', fontSize:'0.875rem', lineHeight:1.6, marginBottom:'1rem'}}>{s.desc}</p>
-              <span style={{color:C.gold, fontSize:'0.85rem', fontWeight:500}}>{s.price}</span>
+              <span style={{color:C.gold, fontSize:'0.85rem', fontWeight:500}}>{s.tag === 'Coming Soon' ? 'Join the waitlist →' : s.price}</span>
             </div>
           ))}
         </div>
@@ -223,16 +229,33 @@ function Packages() {
 }
 
 function Gallery() {
+  const GALLERY_IMAGES = [
+    { src:'/gallery/wipe-on-tint-promo.jpg', alt:'NanoPro Wipe-On Window Tint — now offering' },
+    { src:'/gallery/glow-beyond-promo.jpg', alt:'NanoPro Glow Beyond luminescent coating' },
+    { src:'/gallery/gallery-bmw-exterior.jpg', alt:'BMW M3 before and after full detail' },
+    { src:'/gallery/gallery-tesla.jpg', alt:'Tesla Model S before and after detail' },
+    { src:'/gallery/gallery-interior-detail.jpg', alt:'Interior deep clean before and after' },
+    { src:'/gallery/gallery-bmw-interior.jpg', alt:'BMW interior before and after detail' },
+    { src:'/gallery/gallery-headlight-restore.jpg', alt:'Headlight restoration before and after' },
+    { src:'/gallery/gallery-2d-chameleon-promo.jpg', alt:'NanoPro 2D Chameleon color-changing ceramic coating' },
+  ]
   return (
     <section id="gallery" style={{padding:'6rem 1.5rem', background:C.obs}}>
       <div style={{maxWidth:'1100px', margin:'0 auto'}}>
         <SectionHeader label="The Work" title="Gallery" />
         <div style={{display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:'2px'}}>
-          {Array.from({length:6}).map((_,i) => (
-            <div key={i} style={{aspectRatio:'1', background:C.graph, border:`1px solid ${C.steel}`, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', color:'rgba(200,200,204,0.2)', fontSize:'0.65rem', letterSpacing:'0.1em', textTransform:'uppercase'}}>
-              <span style={{color:'rgba(201,168,76,0.2)', fontSize:'1.5rem', marginBottom:'0.5rem'}}>◈</span>Add Photo
-            </div>
-          ))}
+          {Array.from({length:9}).map((_,i) => {
+            const img = GALLERY_IMAGES[i]
+            return img ? (
+              <div key={i} style={{aspectRatio:'1', overflow:'hidden'}}>
+                <img src={img.src} alt={img.alt} style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}} />
+              </div>
+            ) : (
+              <div key={i} style={{aspectRatio:'1', background:C.graph, border:`1px solid ${C.steel}`, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', color:'rgba(200,200,204,0.2)', fontSize:'0.65rem', letterSpacing:'0.1em', textTransform:'uppercase'}}>
+                <span style={{color:'rgba(201,168,76,0.2)', fontSize:'1.5rem', marginBottom:'0.5rem'}}>◈</span>Add Photo
+              </div>
+            )
+          })}
         </div>
         <p style={{textAlign:'center', color:'rgba(200,200,204,0.4)', fontSize:'0.8rem', marginTop:'2rem'}}>
           Drop before/after photos into <code style={{color:'rgba(201,168,76,0.6)'}}>/public/gallery/</code>
@@ -306,6 +329,8 @@ function Contact() {
               <option style={{color:'#000'}}>Elite Detail — $300+</option>
               <option style={{color:'#000'}}>Paint Correction</option>
               <option style={{color:'#000'}}>Ceramic Coating</option>
+              <option style={{color:'#000'}}>Liquid PPF</option>
+              <option style={{color:'#000'}}>Wipe-On Window Tint</option>
               <option style={{color:'#000'}}>Fleet Detailing</option>
               <option style={{color:'#000'}}>Other / Not sure</option>
             </select>
