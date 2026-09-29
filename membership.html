@@ -1,0 +1,40 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Monthly Maintenance Membership | Bakersfield's Best Mobile Detailing</title>
+<style>
+body{font-family:system-ui,sans-serif;margin:0;background:#0b0f14;color:#eef2f6}
+main{max-width:640px;margin:0 auto;padding:24px 16px}
+h1{font-size:1.8rem;margin:.2em 0}.sub{color:#9fb0c0}
+.card{background:#141b24;border:1px solid #243244;border-radius:12px;padding:16px;margin:16px 0}
+.card h3{margin:0 0 8px}.price{font-size:1.4rem;font-weight:700;color:#4cc2ff}
+ul{padding-left:18px;color:#c9d6e2}
+input,select{width:100%;padding:12px;margin:6px 0;border-radius:8px;border:1px solid #243244;background:#0b0f14;color:#fff;font-size:1rem;box-sizing:border-box}
+button{width:100%;padding:14px;border:0;border-radius:8px;background:#4cc2ff;color:#04121c;font-weight:700;font-size:1rem;margin-top:8px}
+#msg{margin-top:12px;font-weight:600}
+</style></head><body><main>
+<h1>Monthly Maintenance Membership</h1>
+<p class="sub">One mobile detail every month. We come to you, same day each month.</p>
+<div class="card"><h3>What's included</h3><ul>
+<li>Exterior hand wash and dry</li><li>Wheels, tires, and tire shine</li>
+<li>Interior vacuum and wipe-down</li><li>Streak-free windows</li>
+<li>Spray sealant boost</li><li>10% off add-ons, priority booking</li></ul>
+<div class="price">From $125/mo</div><small class="sub">3-month minimum, then cancel anytime with 30 days' notice.</small></div>
+<div class="card"><h3>Join</h3>
+<input id="name" placeholder="Full name"><input id="phone" type="tel" placeholder="Mobile number">
+<input id="email" type="email" placeholder="Email (optional)"><input id="vehicle" placeholder="Vehicle (year, make, model)">
+<select id="size"><option value="">Vehicle size</option>
+<option>Sedan/Coupe - $125/mo</option><option>SUV/Truck - $150/mo</option><option>3-Row/Large - $175/mo</option></select>
+<select id="plan"><option>Maintenance</option><option>Maintenance + Deep Clean every 3rd month</option></select>
+<select id="day"><option value="">Preferred day</option><option>Weekdays</option><option>Saturday</option><option>Flexible</option></select>
+<button onclick="go()">Request Membership</button><div id="msg"></div></div>
+<script>
+async function go(){
+  const v=id=>document.getElementById(id).value, m=document.getElementById('msg');
+  const b={name:v('name'),phone:v('phone'),email:v('email'),vehicle:v('vehicle'),size:v('size'),plan:v('plan'),day:v('day')};
+  if(!b.name||!b.phone||!b.size){m.textContent='Please add name, phone, and vehicle size.';return}
+  m.textContent='Sending...';
+  try{const r=await fetch('/api/membership',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});
+  m.textContent=r.ok?"You're in! We'll text you to confirm your first visit.":'Something went wrong. Please call us.';}
+  catch(e){m.textContent='Something went wrong. Please call us.'}
+}
+</script></main></body></html>
