@@ -1,6 +1,7 @@
 const BASE  = process.env.AIRTABLE_BASE_ID
 const TABLE = process.env.AIRTABLE_TABLE_ID
 const TOKEN = process.env.AIRTABLE_TOKEN
+const { addToCalendar } = require('./_calendar')
 
 const SLOTS = ['9:00 AM', '12:00 PM', '3:00 PM']
 
@@ -84,6 +85,16 @@ async function createBooking(b) {
     console.error('Airtable rejected:', errBody)
     return { ok: false, error: 'Booking save failed: ' + errBody.slice(0, 300) }
   }
+
+  try {
+    await addToCalendar({
+      title: `${b.service} - ${b.name}`,
+      start: slotToISO(b.date, b.slot),
+      minutes: /ceramic|paint/i.test(b.service) ? 240 : 120,
+      description: `${b.phone}\n${b.notes || ''}`,
+      location: b.address || ''
+    })
+  } catch (e) { console.error('Calendar failed:', e.message) }
 
   try {
     const sid = process.env.TWILIO_ACCOUNT_SID
