@@ -121,6 +121,26 @@ async function createBooking(b) {
   return { ok: true, confirmed: `${b.date} at ${b.slot}` }
 }
 
+const FIELD_SERVERS = [{
+  type: 'url',
+  url: 'https://mcp.fieldd.co/crm',
+  name: 'field',
+  authorization_token: process.env.FIELD_MCP_TOKEN
+}]
+const FIELD_TOOLSET = {
+  type: 'mcp_toolset',
+  mcp_server_name: 'field',
+  default_config: { enabled: false },
+  configs: {
+    availability: { enabled: true },
+    services: { enabled: true },
+    customers: { enabled: true },
+    jobs: { enabled: true },
+    leads: { enabled: true },
+    quotes: { enabled: true }
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
   let messages = req.body.messages.map(m => ({ role: m.role, content: m.content }))
@@ -132,13 +152,15 @@ export default async function handler(req, res) {
         headers: {
           'x-api-key': process.env.ANTHROPIC_API_KEY,
           'anthropic-version': '2023-06-01',
+          ...(process.env.FIELD_MCP_TOKEN ? { 'anthropic-beta': 'mcp-client-2025-11-20' } : {}),
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 1024,
           system: SYSTEM,
-          tools: TOOLS,
+          tools: process.env.FIELD_MCP_TOKEN ? [...TOOLS, FIELD_TOOLSET] : TOOLS,
+          ...(process.env.FIELD_MCP_TOKEN ? { mcp_servers: FIELD_SERVERS } : {}),
           messages
         })
       })
