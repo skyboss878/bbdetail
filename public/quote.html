@@ -1,0 +1,31 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Your Quote | Bakersfield's Best Mobile Detailing</title>
+<style>body{font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:20px;background:#f6f7f9;color:#111}
+.card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 8px #0001}
+.row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee}
+.total{font-weight:700;font-size:1.2em;border:none;padding-top:16px}
+button{width:100%;padding:16px;font-size:1.05em;border:0;border-radius:10px;margin-top:12px;font-weight:600}
+.ok{background:#16a34a;color:#fff}.no{background:#e5e7eb}</style></head><body>
+<div class="card" id="c">Loading…</div>
+<script>
+const t=new URLSearchParams(location.search).get('t');
+const $=document.getElementById('c');
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+async function load(){
+  const r=await fetch('/api/quote?t='+encodeURIComponent(t));
+  if(!r.ok){$.textContent='Quote not found.';return}
+  const q=await r.json();
+  let h=`<h2>Hi ${esc(q.name)},</h2><p>Here's your quote from Bakersfield's Best Mobile Detailing${q.vehicle?' for your '+esc(q.vehicle):''}:</p>`;
+  q.items.forEach(i=>h+=`<div class="row"><span>${esc(i.name)}</span><span>$${i.price}</span></div>`);
+  h+=`<div class="row total"><span>Total</span><span>$${q.total}</span></div>`;
+  if(q.status==='Sent') h+=`<button class="ok" onclick="act('approve')">Approve Quote</button><button class="no" onclick="act('decline')">Decline</button>`;
+  else h+=`<p><b>Status: ${esc(q.status)}</b></p>`;
+  $.innerHTML=h;
+}
+async function act(a){
+  const r=await fetch('/api/quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({t,action:a})});
+  if(r.ok){$.innerHTML=a==='approve'?'<h2>Approved ✅</h2><p>Thanks! We\'ll text you to lock in a time.</p>':'<h2>No problem</h2><p>Reply to our text anytime if you change your mind.</p>'}
+  else alert('Something went wrong, please try again.');
+}
+load();
+</script></body></html>

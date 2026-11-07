@@ -1,0 +1,30 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Send Quote</title>
+<style>body{font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:16px}
+input{width:100%;padding:12px;margin:6px 0;font-size:1em;box-sizing:border-box}
+label{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee}
+button{width:100%;padding:16px;font-size:1.05em;background:#111;color:#fff;border:0;border-radius:10px;margin-top:12px}
+h3{margin-bottom:0}</style></head><body>
+<h2>Send a Quote</h2>
+<input id="key" type="password" placeholder="Admin key">
+<input id="name" placeholder="Customer name">
+<input id="phone" type="tel" placeholder="Customer phone">
+<input id="veh" placeholder="Vehicle (e.g. 2019 Silverado)">
+<div id="list"></div>
+<h3 id="tot">Total: $0</h3>
+<button onclick="send()">Text Quote to Customer</button>
+<p id="msg"></p>
+<script>
+let S=[];
+fetch('/api/quote-create').then(r=>r.json()).then(d=>{S=d;
+  const sec=(ty,title)=>`<h3>${title}</h3>`+S.filter(s=>s.type===ty).map(s=>`<label><span><input type="checkbox" style="width:auto" value="${s.id}" onchange="calc()"> ${s.name}</span><span>$${s.price}</span></label>`).join('');
+  document.getElementById('list').innerHTML=sec('package','Packages')+sec('addon','Add-ons');});
+function ids(){return [...document.querySelectorAll('input[type=checkbox]:checked')].map(c=>c.value)}
+function calc(){document.getElementById('tot').textContent='Total: $'+S.filter(s=>ids().includes(s.id)).reduce((a,s)=>a+s.price,0)}
+async function send(){
+  const r=await fetch('/api/quote-create',{method:'POST',headers:{'Content-Type':'application/json','x-admin-key':key.value},
+    body:JSON.stringify({name:name.value,phone:phone.value,vehicle:veh.value,ids:ids()})});
+  const d=await r.json();
+  msg.textContent=r.ok?'Sent! Total $'+d.total:'Error: '+d.error;
+}
+</script></body></html>
