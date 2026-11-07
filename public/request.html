@@ -1,0 +1,68 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Request Service | Bakersfield's Best Mobile Detailing</title>
+<meta name="description" content="Book mobile car detailing in Bakersfield. Choose your package and add-ons and we come to you.">
+<style>
+:root{--navy:#0b1f3a;--blue:#1d6fe0;--bg:#f4f6fa;--line:#e3e7ee}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:#111;padding-bottom:96px}
+header{background:var(--navy);color:#fff;padding:28px 20px;text-align:center}
+header h1{margin:0;font-size:1.4em}header p{margin:6px 0 0;opacity:.8;font-size:.95em}
+main{max-width:560px;margin:0 auto;padding:16px}
+section{background:#fff;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 6px #0001}
+h2{margin:0 0 12px;font-size:1.05em;color:var(--navy)}
+input[type=text],input[type=tel],input[type=date],select,textarea{width:100%;padding:13px;margin:5px 0;font-size:1em;border:1px solid var(--line);border-radius:10px;font-family:inherit}
+.opt{display:flex;justify-content:space-between;align-items:center;padding:13px 4px;border-bottom:1px solid var(--line);cursor:pointer;gap:10px}
+.opt:last-child{border:0}.opt input{margin-right:10px;transform:scale(1.2)}
+.hp{position:absolute;left:-9999px}
+.bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:14px;justify-content:center}
+.bar .t{font-size:.8em;color:#555}.bar b{font-size:1.3em;display:block;color:var(--navy)}
+button{padding:15px 26px;font-size:1.05em;font-weight:600;background:var(--blue);color:#fff;border:0;border-radius:10px}
+button:disabled{opacity:.6}
+.note{font-size:.82em;color:#666;text-align:center;margin:6px 0 0}
+#err{color:#b91c1c;text-align:center;font-weight:600}
+.done{text-align:center;padding:30px 10px}.done h2{font-size:1.4em}
+</style></head><body>
+<header><h1>Bakersfield's Best Mobile Detailing</h1><p>We come to you. Pick your services and request your appointment.</p></header>
+<main id="main">
+<section><h2>1. Your details</h2>
+<input id="name" type="text" placeholder="Full name" autocomplete="name">
+<input id="phone" type="tel" placeholder="Mobile number" autocomplete="tel">
+<input id="vehicle" type="text" placeholder="Vehicle (year, make, model)">
+<input id="address" type="text" placeholder="Service address in Bakersfield" autocomplete="street-address">
+<input id="website" class="hp" type="text" tabindex="-1" autocomplete="off"></section>
+<section><h2>2. Choose a package</h2><div id="pk">Loading…</div></section>
+<section><h2>3. Add-ons</h2><div id="ad"></div></section>
+<section><h2>4. When works for you?</h2>
+<input id="date" type="date">
+<select id="win"><option value="">Preferred time</option><option>Morning (8am–12pm)</option><option>Afternoon (12pm–4pm)</option><option>Evening (4pm–7pm)</option><option>Flexible</option></select>
+<textarea id="notes" rows="3" placeholder="Anything we should know? (pet hair, stains, gate code…)"></textarea></section>
+<p id="err"></p>
+<p class="note">Estimate only. We'll confirm your final price and time by text before anything is booked.</p>
+</main>
+<div class="bar"><div><span class="t">Estimated total</span><b id="tot">$0</b></div><button id="go" onclick="send()">Request Service</button></div>
+<script>
+let S=[];const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+$('date').min=new Date().toISOString().slice(0,10);
+fetch('/api/quote-create').then(r=>r.json()).then(d=>{S=d;
+  const row=(s,t,n)=>`<label class="opt"><span><input type="${t}" name="${n}" value="${s.id}" onchange="calc()">${esc(s.name)}</span><b>$${s.price}</b></label>`;
+  $('pk').innerHTML=S.filter(s=>s.type==='package').map(s=>row(s,'radio','pkg')).join('');
+  $('ad').innerHTML=S.filter(s=>s.type==='addon').map(s=>row(s,'checkbox','add')).join('');
+}).catch(()=>$('pk').textContent='Could not load services. Please refresh.');
+const ids=()=>[...document.querySelectorAll('input[name=pkg]:checked,input[name=add]:checked')].map(i=>i.value);
+function calc(){$('tot').textContent='$'+S.filter(s=>ids().includes(s.id)).reduce((a,s)=>a+s.price,0)}
+async function send(){
+  $('err').textContent='';$('go').disabled=true;$('go').textContent='Sending…';
+  const preferred=[$('date').value,$('win').value].filter(Boolean).join(' · ');
+  try{
+    const r=await fetch('/api/request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      name:$('name').value,phone:$('phone').value,vehicle:$('vehicle').value,address:$('address').value,
+      preferred,notes:$('notes').value,website:$('website').value,ids:ids()})});
+    const d=await r.json();
+    if(!r.ok){$('err').textContent=d.error||'Something went wrong.';return}
+    document.querySelector('.bar').remove();
+    $('main').innerHTML=`<section class="done"><h2>Request received ✅</h2><p>Your ticket number is <b>${esc(d.ticket)}</b>.</p><p>We'll text you shortly to confirm your appointment.</p></section>`;
+    window.scrollTo(0,0);
+  }catch(e){$('err').textContent='Network error. Please try again.'}
+  finally{const g=$('go');if(g){g.disabled=false;g.textContent='Request Service'}}
+}
+</script></body></html>
